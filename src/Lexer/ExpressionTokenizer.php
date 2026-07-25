@@ -6,10 +6,10 @@ namespace Blueprint\Engine\Lexer;
 
 /**
  * Expression Tokenizer
- * 
+ *
  * Tokenizes expression strings inside {{ }} and {% %} tags.
  * Handles variables, strings, numbers, operators, filters, method calls.
- * 
+ *
  * @package Blueprint\Engine\Lexer
  */
 class ExpressionTokenizer
@@ -20,17 +20,17 @@ class ExpressionTokenizer
     public function tokenize(string $expression, TokenStream $stream): void
     {
         $expression = trim($expression);
-        
+
         if ($expression === '') {
             return;
         }
-        
+
         // Split by pipes (filters) respecting nesting
         $parts = $this->splitByPipe($expression);
-        
+
         // First part is the main value
         $this->tokenizeValue($parts[0], $stream);
-        
+
         // Remaining parts are filters
         for ($i = 1; $i < count($parts); $i++) {
             $stream->addToken(TokenTypes::PUNCTUATION, '|');
@@ -48,10 +48,10 @@ class ExpressionTokenizer
         $depth = 0;
         $inString = false;
         $stringChar = '';
-        
+
         for ($i = 0; $i < strlen($expression); $i++) {
             $char = $expression[$i];
-            
+
             if (!$inString) {
                 if ($char === '"' || $char === "'") {
                     $inString = true;
@@ -70,12 +70,12 @@ class ExpressionTokenizer
                     $inString = false;
                 }
             }
-            
+
             $current .= $char;
         }
-        
+
         $parts[] = trim($current);
-        
+
         return $parts;
     }
 
@@ -85,76 +85,76 @@ class ExpressionTokenizer
     private function tokenizeValue(string $value, TokenStream $stream): void
     {
         $value = trim($value);
-        
+
         if ($value === '') {
             return;
         }
-        
+
         // Skip standalone punctuation
         if (in_array($value, [',', '.', '!', '.!'], true)) {
             return;
         }
-        
+
         // Number
         if (is_numeric($value)) {
             $stream->addToken(TokenTypes::NUMBER, $value);
             return;
         }
-        
+
         // String
         if (preg_match('/^["\'](.*)["\']$/s', $value)) {
             $stream->addToken(TokenTypes::STRING, $value);
             return;
         }
-        
+
         // Ternary operator with colon
         if ($this->hasTernaryColon($value)) {
             $this->tokenizeTernary($value, $stream);
             return;
         }
-        
+
         // Array literal {key: value}
         if (preg_match('/^\{.*\}$/s', $value) && str_contains($value, ':')) {
             $this->tokenizeArrayLiteral($value, $stream);
             return;
         }
-        
+
         // Static method call (Class::method())
         if ($this->isStaticMethodCall($value)) {
             $this->tokenizeStaticMethodCall($value, $stream);
             return;
         }
-        
+
         // Function call
         if ($this->isFunctionCall($value)) {
             $this->tokenizeFunctionCall($value, $stream);
             return;
         }
-        
+
         // Operator
         if ($this->isOperator($value)) {
             $stream->addToken(TokenTypes::OPERATOR, $value);
             return;
         }
-        
+
         // Binary expression
         if ($this->hasBinaryOperator($value)) {
             $this->tokenizeBinaryExpression($value, $stream);
             return;
         }
-        
+
         // Property access (obj.prop)
         if (str_contains($value, '.')) {
             $this->tokenizePropertyAccess($value, $stream);
             return;
         }
-        
+
         // Simple name
         if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $value)) {
             $stream->addToken(TokenTypes::NAME, $value);
             return;
         }
-        
+
         // Unknown - add as name
         $stream->addToken(TokenTypes::NAME, $value);
     }
@@ -179,37 +179,37 @@ class ExpressionTokenizer
             $stream->addToken(TokenTypes::NAME, $value);
             return;
         }
-        
+
         $class = trim(substr($value, 0, $doubleColonPos));
         $rest = trim(substr($value, $doubleColonPos + 2));
-        
+
         $stream->addToken(TokenTypes::NAME, $class);
         $stream->addToken(TokenTypes::OPERATOR, '::');
-        
+
         // Parse the rest (method and possible chaining)
         if ($rest !== '') {
             // Find method name
             if (preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)(.*)$/s', $rest, $matches)) {
                 $method = $matches[1];
                 $afterMethod = trim($matches[2]);
-                
+
                 $stream->addToken(TokenTypes::NAME, $method);
-                
+
                 // Check for method arguments
                 if (str_starts_with($afterMethod, '(')) {
                     $closePos = $this->findMatchingParen($afterMethod, 0);
-                    
+
                     if ($closePos !== false) {
                         $args = substr($afterMethod, 1, $closePos - 1);
-                        
+
                         $stream->addToken(TokenTypes::PUNCTUATION, '(');
-                        
+
                         if (trim($args) !== '') {
                             $this->tokenizeArguments($args, $stream);
                         }
-                        
+
                         $stream->addToken(TokenTypes::PUNCTUATION, ')');
-                        
+
                         // Check for method chaining after static call
                         $afterCall = trim(substr($afterMethod, $closePos + 1));
                         if (str_starts_with($afterCall, '.')) {
@@ -242,7 +242,7 @@ class ExpressionTokenizer
             '++', '--', '+', '-', '*', '/', '%',
             '||', '&&', '!', 'and', 'or', 'not', 'in', 'is', '?', ':',
         ];
-        
+
         return in_array(strtolower($value), $operators, true);
     }
 
@@ -254,20 +254,20 @@ class ExpressionTokenizer
         if (!str_contains($value, ':')) {
             return false;
         }
-        
+
         // Skip static method calls (Class::method)
         if (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*\s*::\s*[a-zA-Z_]/', $value)) {
             return false;
         }
-        
+
         // Check if colon is outside strings and brackets
         $depth = 0;
         $inString = false;
         $stringChar = '';
-        
+
         for ($i = 0; $i < strlen($value); $i++) {
             $char = $value[$i];
-            
+
             if (!$inString) {
                 if ($char === '"' || $char === "'") {
                     $inString = true;
@@ -289,7 +289,7 @@ class ExpressionTokenizer
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -300,7 +300,7 @@ class ExpressionTokenizer
     {
         // Split by : respecting nesting
         $parts = $this->splitByColon($value);
-        
+
         if (count($parts) >= 2) {
             $this->tokenizeValue($parts[0], $stream);
             $stream->addToken(TokenTypes::OPERATOR, ':');
@@ -318,10 +318,10 @@ class ExpressionTokenizer
         $depth = 0;
         $inString = false;
         $stringChar = '';
-        
+
         for ($i = 0; $i < strlen($value); $i++) {
             $char = $value[$i];
-            
+
             if (!$inString) {
                 if ($char === '"' || $char === "'") {
                     $inString = true;
@@ -340,12 +340,12 @@ class ExpressionTokenizer
                     $inString = false;
                 }
             }
-            
+
             $current .= $char;
         }
-        
+
         $parts[] = trim($current);
-        
+
         return $parts;
     }
 
@@ -366,28 +366,28 @@ class ExpressionTokenizer
         preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/', $value, $matches);
         $name = $matches[1];
         $argsStart = strlen($matches[0]) - 1;
-        
+
         // Find matching closing paren
         $closePos = $this->findMatchingParen($value, $argsStart);
-        
+
         if ($closePos === false) {
             $stream->addToken(TokenTypes::NAME, $name);
             $stream->addToken(TokenTypes::PUNCTUATION, '(');
             $stream->addToken(TokenTypes::PUNCTUATION, ')');
             return;
         }
-        
+
         $args = substr($value, $argsStart + 1, $closePos - $argsStart - 1);
-        
+
         $stream->addToken(TokenTypes::NAME, $name);
         $stream->addToken(TokenTypes::PUNCTUATION, '(');
-        
+
         if (trim($args) !== '') {
             $this->tokenizeArguments($args, $stream);
         }
-        
+
         $stream->addToken(TokenTypes::PUNCTUATION, ')');
-        
+
         // Check for method chaining
         $rest = trim(substr($value, $closePos + 1));
         if (str_starts_with($rest, '.')) {
@@ -405,15 +405,15 @@ class ExpressionTokenizer
     private function tokenizeArguments(string $args, TokenStream $stream): void
     {
         $parts = $this->splitByComma($args);
-        
+
         foreach ($parts as $i => $part) {
             $part = trim($part);
             if ($part === '') {
                 continue;
             }
-            
+
             $this->tokenizeValue($part, $stream);
-            
+
             if ($i < count($parts) - 1) {
                 $stream->addToken(TokenTypes::PUNCTUATION, ',');
             }
@@ -430,10 +430,10 @@ class ExpressionTokenizer
         $depth = 0;
         $inString = false;
         $stringChar = '';
-        
+
         for ($i = 0; $i < strlen($value); $i++) {
             $char = $value[$i];
-            
+
             if (!$inString) {
                 if ($char === '"' || $char === "'") {
                     $inString = true;
@@ -452,12 +452,12 @@ class ExpressionTokenizer
                     $inString = false;
                 }
             }
-            
+
             $current .= $char;
         }
-        
+
         $parts[] = $current;
-        
+
         return $parts;
     }
 
@@ -469,10 +469,10 @@ class ExpressionTokenizer
         $depth = 0;
         $inString = false;
         $stringChar = '';
-        
+
         for ($i = $openPos; $i < strlen($value); $i++) {
             $char = $value[$i];
-            
+
             if (!$inString) {
                 if ($char === '"' || $char === "'") {
                     $inString = true;
@@ -491,7 +491,7 @@ class ExpressionTokenizer
                 }
             }
         }
-        
+
         return false;
     }
 
@@ -516,7 +516,7 @@ class ExpressionTokenizer
             $stream->addToken(TokenTypes::NAME, $value);
             return;
         }
-        
+
         $this->tokenizeValue(trim($matches[1]), $stream);
         $stream->addToken(TokenTypes::OPERATOR, trim($matches[2]));
         $this->tokenizeValue(trim($matches[3]), $stream);
@@ -528,18 +528,18 @@ class ExpressionTokenizer
     private function tokenizePropertyAccess(string $value, TokenStream $stream): void
     {
         $parts = explode('.', $value);
-        
+
         foreach ($parts as $i => $part) {
             $part = trim($part);
-            
+
             if ($part === '') {
                 continue;
             }
-            
+
             if ($i > 0) {
                 $stream->addToken(TokenTypes::PUNCTUATION, '.');
             }
-            
+
             // Check if part is method call
             if ($this->isFunctionCall($part)) {
                 $this->tokenizeFunctionCall($part, $stream);
@@ -557,32 +557,32 @@ class ExpressionTokenizer
     private function tokenizeArrayLiteral(string $value, TokenStream $stream): void
     {
         $content = trim(substr($value, 1, -1));
-        
+
         $stream->addToken(TokenTypes::PUNCTUATION, '[');
-        
+
         if ($content !== '') {
             $items = $this->splitByComma($content);
-            
+
             foreach ($items as $i => $item) {
                 $item = trim($item);
-                
+
                 if ($item === '') {
                     continue;
                 }
-                
+
                 // Check for key: value
                 if (str_contains($item, ':') && !$this->hasTernaryColon($item)) {
                     $this->tokenizeArrayItem($item, $stream);
                 } else {
                     $this->tokenizeValue($item, $stream);
                 }
-                
+
                 if ($i < count($items) - 1) {
                     $stream->addToken(TokenTypes::PUNCTUATION, ',');
                 }
             }
         }
-        
+
         $stream->addToken(TokenTypes::PUNCTUATION, ']');
     }
 
@@ -594,16 +594,16 @@ class ExpressionTokenizer
         $colonPos = strpos($item, ':');
         $key = trim(substr($item, 0, $colonPos));
         $value = trim(substr($item, $colonPos + 1));
-        
+
         // Key
         if (preg_match('/^["\'](.*)["\']$/s', $key)) {
             $stream->addToken(TokenTypes::STRING, $key);
         } else {
             $stream->addToken(TokenTypes::NAME, $key);
         }
-        
+
         $stream->addToken(TokenTypes::OPERATOR, ':');
-        
+
         // Value
         $this->tokenizeValue($value, $stream);
     }

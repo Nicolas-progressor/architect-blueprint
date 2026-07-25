@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Runtime;
 
 /**
  * HTML Escaper
- * 
+ *
  * Handles HTML escaping for template output.
- * 
+ *
  * @package Blueprint\Engine\Runtime
  */
 class Escaper
 {
     /**
      * Escape value for HTML output
-     * 
+     *
      * @param mixed $value Value to escape
      * @return string
      */
@@ -42,7 +42,7 @@ class Escaper
 
     /**
      * Escape array (convert to JSON and escape)
-     * 
+     *
      * @param array $value Array to escape
      * @return string
      */
@@ -53,7 +53,7 @@ class Escaper
 
     /**
      * Escape object (convert to JSON and escape)
-     * 
+     *
      * @param object $value Object to escape
      * @return string
      */
@@ -62,13 +62,13 @@ class Escaper
         if (method_exists($value, '__toString')) {
             return htmlspecialchars((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         }
-        
+
         return htmlspecialchars(json_encode($value, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8');
     }
 
     /**
      * Escape HTML attribute value
-     * 
+     *
      * @param string $value Value to escape
      * @return string
      */
@@ -79,7 +79,7 @@ class Escaper
 
     /**
      * Escape JavaScript string
-     * 
+     *
      * @param string $value Value to escape
      * @return string
      */
@@ -90,7 +90,7 @@ class Escaper
 
     /**
      * Escape CSS string
-     * 
+     *
      * @param string $value Value to escape
      * @return string
      */
@@ -101,7 +101,7 @@ class Escaper
 
     /**
      * Escape URL
-     * 
+     *
      * @param string $value Value to escape
      * @return string
      */

@@ -6,7 +6,7 @@ namespace Blueprint\Engine\Lexer;
 
 /**
  * Token Types Constants
- * 
+ *
  * @package Blueprint\Engine\Lexer
  */
 final class TokenTypes

@@ -8,9 +8,9 @@ use Exception;
 
 /**
  * Blueprint Exception
- * 
+ *
  * Custom exception class for Blueprint template engine errors.
- * 
+ *
  * @package Blueprint\Engine\Exception
  */
 class BlueprintException extends Exception
@@ -21,7 +21,7 @@ class BlueprintException extends Exception
 
     /**
      * Constructor
-     * 
+     *
      * @param string $message Error message
      * @param string|null $templateName Template name where error occurred
      * @param int|null $lineNumber Line number in template
@@ -36,7 +36,7 @@ class BlueprintException extends Exception
         ?Exception $previous = null
     ) {
         parent::__construct($message, 0, $previous);
-        
+
         $this->templateName = $templateName;
         $this->lineNumber = $lineNumber;
         $this->snippet = $snippet;
@@ -44,7 +44,7 @@ class BlueprintException extends Exception
 
     /**
      * Get template name
-     * 
+     *
      * @return string|null
      */
     public function getTemplateName(): ?string
@@ -54,7 +54,7 @@ class BlueprintException extends Exception
 
     /**
      * Get line number
-     * 
+     *
      * @return int|null
      */
     public function getLineNumber(): ?int
@@ -64,7 +64,7 @@ class BlueprintException extends Exception
 
     /**
      * Get code snippet
-     * 
+     *
      * @return string|null
      */
     public function getSnippet(): ?string
@@ -74,29 +74,29 @@ class BlueprintException extends Exception
 
     /**
      * Get formatted error message
-     * 
+     *
      * @return string
      */
     public function getFormattedMessage(): string
     {
         $message = $this->getMessage();
-        
+
         if ($this->templateName) {
-            $message = "Error in template \"{$this->templateName}\"" 
-                . ($this->lineNumber ? " (line {$this->lineNumber})" : '') 
+            $message = "Error in template \"{$this->templateName}\""
+                . ($this->lineNumber ? " (line {$this->lineNumber})" : '')
                 . ":\n\n" . $message;
         }
-        
+
         if ($this->snippet) {
             $message .= "\n\nTemplate code:\n" . $this->snippet;
         }
-        
+
         return $message;
     }
 
     /**
      * Create syntax error
-     * 
+     *
      * @param string $message Error message
      * @param string|null $templateName Template name
      * @param int|null $lineNumber Line number
@@ -119,7 +119,7 @@ class BlueprintException extends Exception
 
     /**
      * Create runtime error
-     * 
+     *
      * @param string $message Error message
      * @param string|null $templateName Template name
      * @param int|null $lineNumber Line number
@@ -142,7 +142,7 @@ class BlueprintException extends Exception
 
     /**
      * Create loader error
-     * 
+     *
      * @param string $message Error message
      * @param string|null $templateName Template name
      * @return self

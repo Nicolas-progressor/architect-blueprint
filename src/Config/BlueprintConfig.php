@@ -6,10 +6,10 @@ namespace Blueprint\Engine\Config;
 
 /**
  * Immutable Blueprint Configuration
- * 
+ *
  * Handles configuration with path resolution, environment detection,
  * and sensible defaults.
- * 
+ *
  * @package Blueprint\Engine\Config
  */
 class BlueprintConfig
@@ -34,7 +34,7 @@ class BlueprintConfig
         if (defined('ROOT_DIR')) {
             return ROOT_DIR;
         }
-        
+
         return dirname(__DIR__, 4);
     }
 
@@ -100,7 +100,7 @@ class BlueprintConfig
     public function getPaths(): array
     {
         $paths = $this->config['paths'] ?? [];
-        
+
         return array_map(function ($path) {
             if (!$this->isAbsolutePath($path)) {
                 return $this->rootDir . '/' . ltrim($path, '/');
@@ -123,11 +123,11 @@ class BlueprintConfig
     public function getCachePath(): string
     {
         $path = $this->config['cache'] ?? $this->rootDir . '/cache/blueprints/';
-        
+
         if (!$this->isAbsolutePath($path)) {
             return $this->rootDir . '/' . ltrim($path, '/');
         }
-        
+
         return $path;
     }
 
@@ -206,7 +206,7 @@ class BlueprintConfig
 
         $content = file_get_contents($path);
         $config = json_decode($content, true) ?? [];
-        
+
         return new self($config);
     }
 
@@ -216,27 +216,27 @@ class BlueprintConfig
     public static function createForEnvironment(?string $environment = null): self
     {
         $rootDir = defined('ROOT_DIR') ? ROOT_DIR : dirname(__DIR__, 4);
-        
+
         $configPath = $rootDir . '/app/config/blueprint.json';
         $config = [];
-        
+
         if (file_exists($configPath)) {
             $content = file_get_contents($configPath);
             $config = json_decode($content, true) ?? [];
         }
-        
+
         if ($environment === null) {
             $environment = getenv('APP_ENV') ?: 'production';
         }
-        
+
         $envConfigPath = $rootDir . '/app/config/environment/blueprint/' . $environment . '.json';
-        
+
         if (file_exists($envConfigPath)) {
             $envContent = file_get_contents($envConfigPath);
             $envConfig = json_decode($envContent, true) ?? [];
             $config = array_merge($config, $envConfig);
         }
-        
+
         return new self($config);
     }
 }

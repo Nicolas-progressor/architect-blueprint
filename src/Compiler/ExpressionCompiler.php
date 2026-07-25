@@ -6,10 +6,10 @@ namespace Blueprint\Engine\Compiler;
 
 /**
  * Expression Compiler
- * 
+ *
  * Compiles template expressions to PHP code.
  * Handles variables, properties, methods, filters, and operators.
- * 
+ *
  * @package Blueprint\Engine\Compiler
  */
 class ExpressionCompiler
@@ -44,17 +44,17 @@ class ExpressionCompiler
     protected function compileNumber(array $expr): string
     {
         $value = $expr['value'] ?? 0;
-        
+
         // Return number as-is (not quoted)
         if (is_int($value) || is_float($value)) {
             return (string) $value;
         }
-        
+
         // Handle string representation of number
         if (is_numeric($value)) {
             return (string) $value;
         }
-        
+
         return '0';
     }
 
@@ -77,7 +77,7 @@ class ExpressionCompiler
     protected function compileArray(array $expr): string
     {
         $items = $expr['items'] ?? [];
-        
+
         $phpItems = [];
         foreach ($items as $item) {
             if (isset($item['key'])) {
@@ -95,7 +95,7 @@ class ExpressionCompiler
                 $phpItems[] = $this->compile($item);
             }
         }
-        
+
         return '[' . implode(', ', $phpItems) . ']';
     }
 
@@ -105,12 +105,20 @@ class ExpressionCompiler
     protected function compileVariable(array $expr): string
     {
         $name = $expr['name'] ?? '';
-        
+
         // Built-in constants
-        if ($name === 'true') return 'true';
-        if ($name === 'false') return 'false';
-        if ($name === 'null') return 'null';
-        if ($name === 'loop') return '$__loop';
+        if ($name === 'true') {
+            return 'true';
+        }
+        if ($name === 'false') {
+            return 'false';
+        }
+        if ($name === 'null') {
+            return 'null';
+        }
+        if ($name === 'loop') {
+            return '$__loop';
+        }
 
         return "\$__context['" . $name . "'] ?? null";
     }
@@ -122,8 +130,8 @@ class ExpressionCompiler
     {
         $object = $this->compile($expr['object'] ?? []);
         $property = $expr['property'] ?? '';
-        
-        return "\$__runtime->getProperty(" . $object . ", '" . $property . "')";
+
+        return '$__runtime->getProperty(' . $object . ", '" . $property . "')";
     }
 
     /**
@@ -133,11 +141,11 @@ class ExpressionCompiler
     {
         $object = $this->compile($expr['object'] ?? []);
         $method = $expr['method'] ?? '';
-        
+
         $rawArgs = $this->normalizeArgs($expr['args'] ?? []);
         $args = implode(', ', array_map([$this, 'compile'], $rawArgs));
 
-        return "\$__runtime->callMethod(" . $object . ", '" . $method . "', [" . $args . "])";
+        return '$__runtime->callMethod(' . $object . ", '" . $method . "', [" . $args . '])';
     }
 
     /**
@@ -147,12 +155,12 @@ class ExpressionCompiler
     {
         $class = $expr['class'] ?? '';
         $method = $expr['method'] ?? '';
-        
+
         $rawArgs = $this->normalizeArgs($expr['args'] ?? []);
         $args = implode(', ', array_map([$this, 'compile'], $rawArgs));
 
         // Use runtime for static method calls (supports extensions and custom handlers)
-        return "\$__runtime->callStaticMethod('" . $class . "', '" . $method . "', [" . $args . "])";
+        return "\$__runtime->callStaticMethod('" . $class . "', '" . $method . "', [" . $args . '])';
     }
 
     /**
@@ -163,7 +171,7 @@ class ExpressionCompiler
         $class = $expr['class'] ?? '';
         $property = $expr['property'] ?? '';
 
-        return "\\" . $class . "::\$" . $property;
+        return '\\' . $class . '::$' . $property;
     }
 
     /**
@@ -173,15 +181,15 @@ class ExpressionCompiler
     {
         $node = $this->compile($expr['node'] ?? []);
         $name = $expr['name'] ?? '';
-        
+
         $rawArgs = $this->normalizeArgs($expr['args'] ?? []);
         $args = implode(', ', array_map([$this, 'compile'], $rawArgs));
 
         if ($args) {
-            return "\$__runtime->applyFilter('" . $name . "', " . $node . ", [" . $args . "])";
+            return "\$__runtime->applyFilter('" . $name . "', " . $node . ', [' . $args . '])';
         }
-        
-        return "\$__runtime->applyFilter('" . $name . "', " . $node . ")";
+
+        return "\$__runtime->applyFilter('" . $name . "', " . $node . ')';
     }
 
     /**
@@ -204,14 +212,14 @@ class ExpressionCompiler
             default => $operator
         };
 
-        $left = "(" . $left . ")";
-        $right = "(" . $right . ")";
+        $left = '(' . $left . ')';
+        $right = '(' . $right . ')';
 
         if (in_array($operator, ['in', 'not in'], true)) {
-            return $phpOp . "(" . $left . ", " . $right . ")";
+            return $phpOp . '(' . $left . ', ' . $right . ')';
         }
 
-        return $left . " " . $phpOp . " " . $right;
+        return $left . ' ' . $phpOp . ' ' . $right;
     }
 
     /**
@@ -223,7 +231,7 @@ class ExpressionCompiler
         $trueExpr = $this->compile($expr['trueExpr'] ?? []);
         $falseExpr = $this->compile($expr['falseExpr'] ?? []);
 
-        return "(" . $condition . ") ? (" . $trueExpr . ") : (" . $falseExpr . ")";
+        return '(' . $condition . ') ? (' . $trueExpr . ') : (' . $falseExpr . ')';
     }
 
     /**
@@ -232,20 +240,20 @@ class ExpressionCompiler
     protected function compileFunction(array $expr): string
     {
         $name = $expr['name'] ?? '';
-        
+
         $rawArgs = $this->normalizeArgs($expr['args'] ?? []);
         $args = implode(', ', array_map([$this, 'compile'], $rawArgs));
 
         // Built-in functions
         if ($name === 'dump') {
-            return "var_export(" . ($args ?: '$__context') . ", true)";
+            return 'var_export(' . ($args ?: '$__context') . ', true)';
         }
-        
+
         if ($name === 'range') {
-            return "range(" . $args . ")";
+            return 'range(' . $args . ')';
         }
-        
-        return "\$__runtime->callFunction('" . $name . "', [" . $args . "], \$__context)";
+
+        return "\$__runtime->callFunction('" . $name . "', [" . $args . '], $__context)';
     }
 
     /**
@@ -267,11 +275,11 @@ class ExpressionCompiler
         if (($expr['type'] ?? '') === 'filter' && ($expr['name'] ?? '') === 'raw') {
             return true;
         }
-        
+
         if (isset($expr['node']) && is_array($expr['node'])) {
             return $this->hasRawFilter($expr['node']);
         }
-        
+
         return false;
     }
 }

@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * Conversion Functions
- * 
+ *
  * Functions for type conversion.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class ConversionFunctions
 {
     /**
      * Get all conversion functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array

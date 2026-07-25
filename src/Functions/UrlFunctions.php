@@ -6,18 +6,18 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * URL Functions
- * 
+ *
  * Functions for URL handling.
  * Note: These functions are standalone and don't depend on Architect framework.
  * For framework integration, use the integration layer.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class UrlFunctions
 {
     /**
      * Get all URL functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array
@@ -43,11 +43,11 @@ class UrlFunctions
     public static function url(string $path = '', array $params = []): string
     {
         $url = '/' . ltrim($path, '/');
-        
+
         if (!empty($params)) {
             $url .= '?' . http_build_query($params);
         }
-        
+
         return $url;
     }
 

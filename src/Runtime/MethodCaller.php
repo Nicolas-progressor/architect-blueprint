@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Runtime;
 
 /**
  * Method Caller
- * 
+ *
  * Handles method calls on objects within templates.
- * 
+ *
  * @package Blueprint\Engine\Runtime
  */
 class MethodCaller
 {
     /**
      * Call method on object
-     * 
+     *
      * @param mixed $object Object to call method on
      * @param string $method Method name
      * @param array $args Method arguments
@@ -45,7 +45,7 @@ class MethodCaller
 
     /**
      * Check if method exists on object
-     * 
+     *
      * @param mixed $object Object
      * @param string $method Method name
      * @return bool
@@ -69,7 +69,7 @@ class MethodCaller
 
     /**
      * Call method with named arguments
-     * 
+     *
      * @param mixed $object Object to call method on
      * @param string $method Method name
      * @param array $namedArgs Named arguments
@@ -89,11 +89,11 @@ class MethodCaller
         try {
             $reflection = new \ReflectionMethod($object, $method);
             $parameters = $reflection->getParameters();
-            
+
             $args = [];
             foreach ($parameters as $param) {
                 $name = $param->getName();
-                
+
                 if (array_key_exists($name, $namedArgs)) {
                     $args[] = $namedArgs[$name];
                 } elseif ($param->isDefaultValueAvailable()) {

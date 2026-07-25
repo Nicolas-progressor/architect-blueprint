@@ -6,9 +6,9 @@ namespace Blueprint\Engine\Lexer;
 
 /**
  * Token Value Object
- * 
+ *
  * Immutable token representation.
- * 
+ *
  * @package Blueprint\Engine\Lexer
  */
 final class Token
@@ -28,7 +28,7 @@ final class Token
         if ($this->type !== $type) {
             return false;
         }
-        
+
         return $value === null || $this->value === $value;
     }
 

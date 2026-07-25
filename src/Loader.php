@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Blueprint\Engine;
 
-use Blueprint\Engine\Config\BlueprintConfig;
 use Blueprint\Engine\Cache\CacheManager;
+use Blueprint\Engine\Config\BlueprintConfig;
 use Blueprint\Engine\Exception\BlueprintException;
 
 /**
  * Template Loader
- * 
+ *
  * Handles loading templates from filesystem with support for
  * multiple paths, extensions, and caching.
- * 
+ *
  * @package Blueprint\Engine
  */
 class Loader
@@ -27,7 +27,7 @@ class Loader
 
     /**
      * Constructor
-     * 
+     *
      * @param BlueprintConfig|array $config Configuration or paths array (for BC)
      * @param CacheManager|string|null $cache Cache manager or path (for BC)
      * @param bool $cacheEnabled Cache enabled flag (for BC)
@@ -47,7 +47,7 @@ class Loader
         }
 
         $this->config = $config;
-        
+
         // Initialize cache manager
         if ($cache instanceof CacheManager) {
             $this->cache = $cache;
@@ -81,7 +81,7 @@ class Loader
 
     /**
      * Add template path
-     * 
+     *
      * @param string $path Path to add
      * @return self
      */
@@ -95,7 +95,7 @@ class Loader
 
     /**
      * Set template paths
-     * 
+     *
      * @param array $paths Array of paths
      * @return self
      */
@@ -110,7 +110,7 @@ class Loader
 
     /**
      * Get template paths
-     * 
+     *
      * @return array
      */
     public function getPaths(): array
@@ -120,7 +120,7 @@ class Loader
 
     /**
      * Add template extension
-     * 
+     *
      * @param string $extension Extension to add
      * @return self
      */
@@ -134,7 +134,7 @@ class Loader
 
     /**
      * Set template extensions
-     * 
+     *
      * @param array $extensions Array of extensions
      * @return self
      */
@@ -146,7 +146,7 @@ class Loader
 
     /**
      * Get template extensions
-     * 
+     *
      * @return array
      */
     public function getExtensions(): array
@@ -156,7 +156,7 @@ class Loader
 
     /**
      * Set cache path
-     * 
+     *
      * @param string $path Cache directory path
      * @return self
      */
@@ -168,7 +168,7 @@ class Loader
 
     /**
      * Get cache path
-     * 
+     *
      * @return string
      */
     public function getCachePath(): string
@@ -178,7 +178,7 @@ class Loader
 
     /**
      * Set cache enabled
-     * 
+     *
      * @param bool $enabled Cache enabled flag
      * @return self
      */
@@ -190,7 +190,7 @@ class Loader
 
     /**
      * Check if cache is enabled
-     * 
+     *
      * @return bool
      */
     public function isCacheEnabled(): bool
@@ -200,7 +200,7 @@ class Loader
 
     /**
      * Find template file
-     * 
+     *
      * @param string $name Template name
      * @return string|null
      */
@@ -249,7 +249,7 @@ class Loader
 
     /**
      * Check if template exists
-     * 
+     *
      * @param string $name Template name
      * @return bool
      */
@@ -260,7 +260,7 @@ class Loader
 
     /**
      * Get template source content
-     * 
+     *
      * @param string $name Template name
      * @return string
      * @throws BlueprintException
@@ -268,7 +268,7 @@ class Loader
     public function getSource(string $name): string
     {
         $path = $this->findTemplate($name);
-        
+
         if ($path === null) {
             throw BlueprintException::loaderError(
                 "Template \"{$name}\" not found",
@@ -277,7 +277,7 @@ class Loader
         }
 
         $content = file_get_contents($path);
-        
+
         if ($content === false) {
             throw BlueprintException::loaderError(
                 "Failed to read template \"{$name}\"",
@@ -290,7 +290,7 @@ class Loader
 
     /**
      * Get template path
-     * 
+     *
      * @param string $name Template name
      * @return string|null
      */
@@ -301,14 +301,14 @@ class Loader
 
     /**
      * Get relative template path
-     * 
+     *
      * @param string $name Template name
      * @return string
      */
     public function getRelativePath(string $name): string
     {
         $path = $this->findTemplate($name);
-        
+
         if ($path === null) {
             return $name;
         }
@@ -325,7 +325,7 @@ class Loader
 
     /**
      * Get cache key for template
-     * 
+     *
      * @param string $name Template name
      * @return string
      */
@@ -336,7 +336,7 @@ class Loader
 
     /**
      * Get compiled template path
-     * 
+     *
      * @param string $name Template name
      * @return string
      */
@@ -348,7 +348,7 @@ class Loader
 
     /**
      * Check if compilation is needed (template is fresh)
-     * 
+     *
      * @param string $name Template name
      * @return bool
      */
@@ -364,7 +364,7 @@ class Loader
         }
 
         $compiledPath = $this->getCompiledPath($name);
-        
+
         if (!file_exists($compiledPath)) {
             return false;
         }
@@ -374,7 +374,7 @@ class Loader
 
     /**
      * Set application context
-     * 
+     *
      * @param array $context Context array
      * @return self
      */
@@ -386,7 +386,7 @@ class Loader
 
     /**
      * Get application context
-     * 
+     *
      * @return array
      */
     public function getAppContext(): array
@@ -396,7 +396,7 @@ class Loader
 
     /**
      * Add path for specific application
-     * 
+     *
      * @param string $app App name
      * @param string $templateDir Template directory pattern
      * @return self
@@ -409,7 +409,7 @@ class Loader
 
     /**
      * Clear all template cache
-     * 
+     *
      * @return bool
      */
     public function clearCache(): bool
@@ -420,7 +420,7 @@ class Loader
 
     /**
      * Clear cache for specific template
-     * 
+     *
      * @param string $name Template name
      * @return bool
      */
@@ -441,7 +441,7 @@ class Loader
 
     /**
      * Get list of all available templates
-     * 
+     *
      * @return array
      */
     public function getTemplateList(): array
@@ -460,7 +460,7 @@ class Loader
             foreach ($iterator as $file) {
                 if ($file->isFile()) {
                     $relativePath = ltrim(str_replace($path, '', $file->getPathname()), '/');
-                    
+
                     // Remove extension
                     foreach ($this->extensions as $ext) {
                         if (str_ends_with($relativePath, $ext)) {
@@ -479,7 +479,7 @@ class Loader
 
     /**
      * Check if path is absolute
-     * 
+     *
      * @param string $path Path to check
      * @return bool
      */

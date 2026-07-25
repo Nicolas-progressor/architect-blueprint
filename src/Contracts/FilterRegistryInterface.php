@@ -6,7 +6,7 @@ namespace Blueprint\Engine\Contracts;
 
 /**
  * Filter Registry Interface
- * 
+ *
  * @package Blueprint\Engine\Contracts
  */
 interface FilterRegistryInterface

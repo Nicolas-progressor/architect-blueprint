@@ -8,17 +8,17 @@ use Blueprint\Engine\Exception\BlueprintException;
 
 /**
  * Parser - Template AST Parser
- * 
+ *
  * Main facade that coordinates parsing components.
  * Parses tokens from Lexer into an Abstract Syntax Tree (AST).
- * 
+ *
  * @package Blueprint\Engine\Parser
  */
 class Parser
 {
     /**
      * Parse tokens into AST
-     * 
+     *
      * @param array $tokens Token array from Lexer
      * @return array AST
      * @throws BlueprintException
@@ -27,13 +27,13 @@ class Parser
     {
         $context = new ParserContext($tokens);
         $expressionParser = new ExpressionParser($context);
-        
+
         // Create bodyParser with null statementParser first
         $bodyParser = new BodyParser($context, $expressionParser, null);
-        
+
         // Create statementParser with bodyParser reference
         $statementParser = new StatementParser($context, $expressionParser, $bodyParser);
-        
+
         // Update bodyParser with statementParser
         $bodyParser->setStatementParser($statementParser);
 

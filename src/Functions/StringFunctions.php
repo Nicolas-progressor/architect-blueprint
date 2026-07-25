@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * String Functions
- * 
+ *
  * Functions for string manipulation.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class StringFunctions
 {
     /**
      * Get all string functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array

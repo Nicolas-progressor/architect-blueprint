@@ -8,9 +8,9 @@ use Blueprint\Engine\Exception\BlueprintException;
 
 /**
  * Token Stream
- * 
+ *
  * Provides navigation over token stream with lookahead.
- * 
+ *
  * @package Blueprint\Engine\Lexer
  */
 class TokenStream
@@ -58,7 +58,7 @@ class TokenStream
     public function expect(string $type, ?string $value = null): Token
     {
         $token = $this->current();
-        
+
         if ($token === null || !$token->is($type, $value)) {
             throw BlueprintException::syntaxError(
                 sprintf(
@@ -127,7 +127,7 @@ class TokenStream
 
     /**
      * Get all tokens
-     * 
+     *
      * @return Token[]
      */
     public function getTokens(): array

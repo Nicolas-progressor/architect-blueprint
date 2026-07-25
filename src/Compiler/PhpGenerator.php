@@ -6,10 +6,10 @@ namespace Blueprint\Engine\Compiler;
 
 /**
  * PHP Code Generator
- * 
+ *
  * Generates PHP code structure for compiled templates.
  * Handles header generation, code wrapping, and optimization.
- * 
+ *
  * @package Blueprint\Engine\Compiler
  */
 class PhpGenerator
@@ -22,16 +22,16 @@ class PhpGenerator
         $php = "<?php\n";
         $php .= "/*\n";
         $php .= " * Blueprint compiled template: {$templateName}\n";
-        $php .= " * Generated at: " . date('Y-m-d H:i:s') . "\n";
+        $php .= ' * Generated at: ' . date('Y-m-d H:i:s') . "\n";
         $php .= " */\n\n";
-        
+
         $php .= "\$__context = \$__context ?? [];\n";
         $php .= "\$__blocks = \$__blocks ?? [];\n";
         $php .= "\$__macros = \$__macros ?? [];\n";
         $php .= "\$__sections = \$__context['__sections'] ?? \$__sections ?? [];\n";
         $php .= "\$__runtime = \$__context['__runtime'] ?? null;\n";
         $php .= "\$__blueprint = \$__context['__blueprint'] ?? null;\n\n";
-        
+
         return $php;
     }
 
@@ -41,13 +41,13 @@ class PhpGenerator
     public function wrapWithLayout(string $layout, string $bodyPhp): string
     {
         $php = "\n// Layout: {$layout}\n";
-        
+
         if (str_contains($layout, '$')) {
             $php .= "\$__layoutTemplate = {$layout};\n";
         } else {
             $php .= "\$__layoutTemplate = '{$layout}';\n";
         }
-        
+
         $php .= "\$__layoutSections = [];\n";
         $php .= "\$__layoutContent = '';\n\n";
         $php .= "// Capture sections and content\n";
@@ -63,7 +63,7 @@ class PhpGenerator
         $php .= "} else {\n";
         $php .= "    echo \$__layoutContent;\n";
         $php .= "}\n";
-        
+
         return $php;
     }
 
@@ -77,12 +77,12 @@ class PhpGenerator
         $php .= "ob_start();\n";
         $php .= $bodyPhp;
         $php .= "\$__parentContent = ob_get_clean();\n\n";
-        
+
         $php .= "// Register blocks\n";
         foreach ($blocks as $name => $blockContent) {
             $php .= "\$__blocks['{$name}'] = " . var_export($blockContent, true) . ";\n";
         }
-        
+
         $php .= "\n// Render parent template\n";
         $php .= "if (\$__blueprint && \$__blueprint->exists('{$extends}')) {\n";
         $php .= "    \$__parentContext = \$__context;\n";
@@ -91,7 +91,7 @@ class PhpGenerator
         $php .= "} else {\n";
         $php .= "    echo \$__parentContent;\n";
         $php .= "}\n";
-        
+
         return $php;
     }
 
@@ -102,13 +102,13 @@ class PhpGenerator
     {
         // Remove empty echo statements
         $php = preg_replace("/echo '';\n?/", '', $php);
-        
+
         // Combine consecutive echo statements
         $php = preg_replace("/echo '([^']+)';\s+echo '([^']+)';/s", "echo '$1$2';", $php);
-        
+
         // Remove redundant whitespace
         $php = preg_replace("/\n{3,}/", "\n\n", $php);
-        
+
         return $php;
     }
 
@@ -120,13 +120,13 @@ class PhpGenerator
         $lines = explode("\n", $code);
         $start = max(0, $line - $context - 1);
         $end = min(count($lines), $line + $context);
-        
+
         $snippet = '';
         for ($i = $start; $i < $end; $i++) {
             $prefix = ($i + 1 === $line) ? '>>> ' : '    ';
             $snippet .= $prefix . ($i + 1) . ': ' . ($lines[$i] ?? '') . "\n";
         }
-        
+
         return $snippet;
     }
 }

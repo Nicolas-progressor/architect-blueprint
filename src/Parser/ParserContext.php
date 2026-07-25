@@ -8,9 +8,9 @@ use Blueprint\Engine\Exception\BlueprintException;
 
 /**
  * Parser Context
- * 
+ *
  * Manages token stream navigation during parsing.
- * 
+ *
  * @package Blueprint\Engine\Parser
  */
 class ParserContext
@@ -18,7 +18,7 @@ class ParserContext
     private array $tokens;
     private int $position = 0;
     private int $depth = 0;
-    
+
     private const MAX_DEPTH = 50;
 
     /**
@@ -59,7 +59,7 @@ class ParserContext
     public function expect(string $type, ?string $value = null): array
     {
         $token = $this->current();
-        
+
         if ($token === null || $token[0] !== $type) {
             throw BlueprintException::syntaxError(
                 sprintf('Expected token %s, got %s', $type, $token[0] ?? 'null'),
@@ -85,11 +85,11 @@ class ParserContext
     public function match(string $type, ?string $value = null): bool
     {
         $token = $this->current();
-        
+
         if ($token === null || $token[0] !== $type) {
             return false;
         }
-        
+
         return $value === null || $token[1] === $value;
     }
 
@@ -107,7 +107,7 @@ class ParserContext
     public function enterDepth(): void
     {
         $this->depth++;
-        
+
         if ($this->depth > self::MAX_DEPTH) {
             throw BlueprintException::syntaxError(
                 'Maximum nesting depth exceeded',

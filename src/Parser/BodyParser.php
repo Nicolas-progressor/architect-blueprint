@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Blueprint\Engine\Parser;
 
-use Blueprint\Engine\Exception\BlueprintException;
 use Blueprint\Engine\Lexer\TokenTypes;
 
 /**
  * Body Parser
- * 
+ *
  * Parses body content - sequences of nodes.
- * 
+ *
  * @package Blueprint\Engine\Parser
  */
 class BodyParser
@@ -64,11 +63,11 @@ class BodyParser
 
             $this->context->enterDepth();
             $node = $this->parseNode();
-            
+
             if ($node !== null) {
                 $nodes[] = $node;
             }
-            
+
             $this->context->exitDepth();
         }
 
@@ -136,7 +135,7 @@ class BodyParser
     {
         $this->context->expect(TokenTypes::VARIABLE_START);
         $line = $this->context->current()[2] ?? 0;
-        
+
         $expr = $this->expressionParser->parse();
 
         // Handle chain marker
@@ -173,12 +172,12 @@ class BodyParser
     {
         $this->context->advance();
         $line = $this->context->current()[2] ?? 0;
-        
+
         while (!$this->context->match(TokenTypes::COMMENT_END)) {
             $this->context->advance();
         }
         $this->context->advance();
-        
+
         return NodeFactory::comment($line);
     }
 }

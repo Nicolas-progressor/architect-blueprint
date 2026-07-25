@@ -9,10 +9,10 @@ use Blueprint\Engine\Loader;
 
 /**
  * Element Renderer
- * 
+ *
  * Handles rendering of elements and widgets.
  * Supports MVC widgets, template files, and registered callbacks.
- * 
+ *
  * @package Blueprint\Engine\Template
  */
 class ElementRenderer
@@ -109,7 +109,7 @@ class ElementRenderer
 
     /**
      * Render element (widget)
-     * 
+     *
      * Elements can be:
      * 1. MVC widgets (with container + elements.json)
      * 2. Template files (.blu in elements/)
@@ -120,10 +120,10 @@ class ElementRenderer
         // 1. If Container and element config exists - try to render MVC widget
         if ($this->container && isset($this->elementsConfig[$name])) {
             $elementConfig = $this->elementsConfig[$name];
-            
+
             try {
                 $result = $this->renderMvcWidget($elementConfig, $data);
-                
+
                 if ($result !== '' && !str_contains($result, 'not found')) {
                     return $result;
                 }
@@ -136,7 +136,7 @@ class ElementRenderer
         if ($this->elementManager && $this->elementManager->has($name)) {
             return $this->elementManager->render($name, array_merge($this->context, $data));
         }
-        
+
         // 3. Fallback: try to load .blu file element relative to current template
         if ($this->currentTemplate && $blueprint) {
             $elementTemplate = dirname($this->currentTemplate) . '/elements/' . $name;
@@ -144,7 +144,7 @@ class ElementRenderer
                 return $blueprint->render($elementTemplate, array_merge($this->context, $data));
             }
         }
-        
+
         // 4. Try elements/ in template paths
         if ($blueprint) {
             $elementTemplate = 'elements/' . $name;
@@ -157,7 +157,7 @@ class ElementRenderer
         if ($this->debug) {
             return "<!-- Element '{$name}' not found -->";
         }
-        
+
         return '';
     }
 
@@ -167,7 +167,7 @@ class ElementRenderer
     protected function renderMvcWidget(array $config, array $data = []): string
     {
         if (!isset($config['module']) || !isset($config['controller']) || !isset($config['action'])) {
-            return "<!-- Widget config invalid: missing module/controller/action -->";
+            return '<!-- Widget config invalid: missing module/controller/action -->';
         }
 
         $apps = $this->container->get('apps');
@@ -179,7 +179,7 @@ class ElementRenderer
         $appPath = $apps->appdir . "modules/{$module}/widget/{$controller}.php";
         $globalPath = APP_DIR . "modules/{$module}/widget/{$controller}.php";
         $isGlobal = false;
-        
+
         if (file_exists($appPath)) {
             require_once $appPath;
             $namespace = "app\\{$apps->app}\\modules\\{$module}\\widget";
@@ -192,27 +192,27 @@ class ElementRenderer
         } else {
             return "<!-- Widget '{$module}/{$controller}' not found -->";
         }
-        
+
         if (!class_exists($className)) {
             return "<!-- Widget class '{$className}' not found -->";
         }
 
         try {
             $widget = new $className($this->container, $module, $isGlobal);
-            
+
             $dataMethod = "{$action}_app_data";
             $outputMethod = "{$action}_app_output";
-            
+
             if (method_exists($widget, $dataMethod)) {
                 $widget->{$dataMethod}();
             }
-            
+
             ob_start();
             if (method_exists($widget, $outputMethod)) {
                 $widget->{$outputMethod}();
             }
             return ob_get_clean();
-            
+
         } catch (\Throwable $e) {
             if ($this->debug) {
                 return "<!-- Widget error: {$e->getMessage()} -->";

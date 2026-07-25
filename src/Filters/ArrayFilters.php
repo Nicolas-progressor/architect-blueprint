@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Filters;
 
 /**
  * Array Filters
- * 
+ *
  * Filters for array manipulation.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class ArrayFilters
 {
     /**
      * Get all array filters
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFilters(): array

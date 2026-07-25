@@ -6,9 +6,9 @@ namespace Blueprint\Engine\Contracts;
 
 /**
  * Runtime Interface
- * 
+ *
  * Contract for template runtime environment.
- * 
+ *
  * @package Blueprint\Engine\Contracts
  */
 interface RuntimeInterface

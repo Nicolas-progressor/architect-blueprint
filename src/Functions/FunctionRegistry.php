@@ -8,31 +8,31 @@ use Blueprint\Engine\Contracts\FunctionRegistryInterface;
 
 /**
  * Function Registry
- * 
+ *
  * Manages function registration and retrieval.
  * Supports lazy loading of function groups.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class FunctionRegistry implements FunctionRegistryInterface
 {
     /**
      * Registered functions
-     * 
+     *
      * @var array<string, callable>
      */
     protected array $functions = [];
 
     /**
      * Function groups (lazy loaded)
-     * 
+     *
      * @var array<string, class-string>
      */
     protected array $groups = [];
 
     /**
      * Loaded groups cache
-     * 
+     *
      * @var array<string, bool>
      */
     protected array $loadedGroups = [];
@@ -77,7 +77,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Register a function
-     * 
+     *
      * @param string $name Function name
      * @param callable $function Function callable
      */
@@ -88,7 +88,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Register multiple functions
-     * 
+     *
      * @param array<string, callable> $functions Functions to register
      */
     public function registerMany(array $functions): void
@@ -100,7 +100,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Get function by name
-     * 
+     *
      * @param string $name Function name
      * @return callable|null
      */
@@ -119,7 +119,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Check if function exists
-     * 
+     *
      * @param string $name Function name
      * @return bool
      */
@@ -137,7 +137,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Get all registered functions
-     * 
+     *
      * @return array<string, callable>
      */
     public function getAll(): array
@@ -152,7 +152,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Remove a function
-     * 
+     *
      * @param string $name Function name
      */
     public function remove(string $name): void
@@ -171,7 +171,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Load function from groups
-     * 
+     *
      * @param string $name Function name
      */
     protected function loadFunctionFromGroups(string $name): void
@@ -184,7 +184,7 @@ class FunctionRegistry implements FunctionRegistryInterface
             // Check if this group might have the function
             if (method_exists($class, $name) || $this->groupHasFunction($class, $name)) {
                 $this->loadGroup($groupName);
-                
+
                 if (isset($this->functions[$name])) {
                     return;
                 }
@@ -202,7 +202,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Load a function group
-     * 
+     *
      * @param string $groupName Group name
      */
     protected function loadGroup(string $groupName): void
@@ -232,7 +232,7 @@ class FunctionRegistry implements FunctionRegistryInterface
 
     /**
      * Register a custom function group
-     * 
+     *
      * @param string $name Group name
      * @param string $class Class name with getFunctions() method
      */

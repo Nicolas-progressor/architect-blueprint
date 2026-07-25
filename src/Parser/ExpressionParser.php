@@ -9,9 +9,9 @@ use Blueprint\Engine\Lexer\TokenTypes;
 
 /**
  * Expression Parser
- * 
+ *
  * Parses expressions: variables, functions, operators, filters, etc.
- * 
+ *
  * @package Blueprint\Engine\Parser
  */
 class ExpressionParser
@@ -29,7 +29,7 @@ class ExpressionParser
     public function parse(int $precedence = 0): array
     {
         $left = $this->parsePrimary();
-        
+
         // Check ternary operator
         if ($this->context->match(TokenTypes::OPERATOR, '?')) {
             return $this->parseTernary($left);
@@ -44,7 +44,7 @@ class ExpressionParser
     private function parsePrimary(): array
     {
         $token = $this->context->current();
-        
+
         if ($token === null) {
             throw BlueprintException::syntaxError(
                 'Unexpected end of expression',
@@ -57,7 +57,7 @@ class ExpressionParser
         if ($token[0] === TokenTypes::PUNCTUATION && $token[1] === '.') {
             return ['type' => 'chain', 'line' => $token[2] ?? 0];
         }
-        
+
         switch ($token[0]) {
             case TokenTypes::NUMBER:
                 return $this->parseNumber();
@@ -100,7 +100,7 @@ class ExpressionParser
     private function parsePunctuation(): array
     {
         $token = $this->context->current();
-        
+
         if ($token[1] === '(') {
             $this->context->advance();
             $expr = $this->parse();
@@ -126,19 +126,19 @@ class ExpressionParser
     {
         $token = $this->context->current();
         $this->context->advance();
-        
+
         $items = [];
-        
+
         while (!$this->context->match(TokenTypes::PUNCTUATION, ']')) {
             $items[] = $this->parse();
-            
+
             if (!$this->context->match(TokenTypes::PUNCTUATION, ']')) {
                 $this->context->expect(TokenTypes::PUNCTUATION, ',');
             }
         }
-        
+
         $this->context->expect(TokenTypes::PUNCTUATION, ']');
-        
+
         return NodeFactory::arrayNode($items, $token[2] ?? 0);
     }
 
@@ -152,7 +152,7 @@ class ExpressionParser
         $line = $nameToken[2] ?? 0;
 
         // Check for static method call (Class::method)
-        if ($this->context->match(TokenTypes::OPERATOR, '::') || 
+        if ($this->context->match(TokenTypes::OPERATOR, '::') ||
             $this->context->match(TokenTypes::PUNCTUATION, '::')) {
             return $this->parseStaticMethodCall($name, $line);
         }
@@ -171,7 +171,7 @@ class ExpressionParser
         if ($this->context->match(TokenTypes::PUNCTUATION, '.')) {
             return $this->parsePropertyAccess(NodeFactory::variable($name, $line));
         }
-        
+
         return NodeFactory::variable($name, $line);
     }
 
@@ -181,23 +181,23 @@ class ExpressionParser
     private function parseStaticMethodCall(string $className, int $line): array
     {
         $this->context->advance(); // consume '::'
-        
+
         $methodToken = $this->context->expect(TokenTypes::NAME);
         $methodName = $methodToken[1];
         $methodLine = $methodToken[2] ?? 0;
-        
+
         // Check if it's a method call with arguments
         if ($this->context->match(TokenTypes::PUNCTUATION, '(')) {
             $result = $this->parseArguments();
             $node = NodeFactory::staticMethod($className, $methodName, $result['args'], $line);
-            
+
             if ($result['hasChain']) {
                 $node = $this->parsePropertyAccess($node);
             }
-            
+
             return $node;
         }
-        
+
         // Static property access (rare but possible)
         return NodeFactory::staticProperty($className, $methodName, $line);
     }
@@ -209,11 +209,11 @@ class ExpressionParser
     {
         $result = $this->parseArguments();
         $node = NodeFactory::functionCall($name, $result['args'], $line);
-        
+
         if ($result['hasChain']) {
             $node = $this->parsePropertyAccess($node);
         }
-        
+
         return $node;
     }
 
@@ -243,7 +243,7 @@ class ExpressionParser
                     $result['args'],
                     $propToken[2] ?? 0
                 );
-                
+
                 if ($result['hasChain']) {
                     return $this->parsePropertyAccess($node);
                 }
@@ -253,21 +253,21 @@ class ExpressionParser
         // Continue chain
         while ($this->context->match(TokenTypes::PUNCTUATION, '.')) {
             $this->context->advance();
-            
+
             $propToken = $this->context->expect(TokenTypes::NAME);
             $propName = $propToken[1];
             $propLine = $propToken[2] ?? 0;
-            
+
             if ($this->context->match(TokenTypes::PUNCTUATION, '(')) {
                 $result = $this->parseArguments();
                 $node = NodeFactory::method($node, $propName, $result['args'], $propLine);
-                
+
                 if (!$result['hasChain'] && !$this->context->match(TokenTypes::PUNCTUATION, '.')) {
                     return $node;
                 }
             } else {
                 $node = NodeFactory::property($node, $propName, $propLine);
-                
+
                 if ($this->isFilterOperator()) {
                     $node = $this->parseFilters($node);
                 }
@@ -312,13 +312,13 @@ class ExpressionParser
 
         while (!$this->context->match(TokenTypes::PUNCTUATION, ')')) {
             $expr = $this->parse();
-            
+
             if (isset($expr['type']) && $expr['type'] === 'chain') {
                 return ['args' => $args, 'hasChain' => true];
             }
 
             $args[] = $expr;
-            
+
             if ($this->context->match(TokenTypes::PUNCTUATION, ')')) {
                 break;
             }
@@ -327,12 +327,12 @@ class ExpressionParser
         }
 
         $this->context->expect(TokenTypes::PUNCTUATION, ')');
-        
+
         // Check for chaining but DON'T consume the dot
         if ($this->context->match(TokenTypes::PUNCTUATION, '.')) {
             $hasChain = true;
         }
-        
+
         return ['args' => $args, 'hasChain' => $hasChain];
     }
 
@@ -343,10 +343,10 @@ class ExpressionParser
     {
         $this->context->advance(); // consume '?'
         $trueExpr = $this->parse();
-        
+
         $this->context->expect(TokenTypes::OPERATOR, ':');
         $falseExpr = $this->parse();
-        
+
         return NodeFactory::ternary($condition, $trueExpr, $falseExpr, $condition['line'] ?? 0);
     }
 
@@ -357,7 +357,7 @@ class ExpressionParser
     {
         while (true) {
             $token = $this->context->current();
-            
+
             if ($token === null || !$this->context->match(TokenTypes::OPERATOR)) {
                 break;
             }
@@ -380,7 +380,7 @@ class ExpressionParser
      */
     private function isFilterOperator(): bool
     {
-        return $this->context->match(TokenTypes::PUNCTUATION, '|') 
+        return $this->context->match(TokenTypes::PUNCTUATION, '|')
             || $this->context->match(TokenTypes::OPERATOR, '|');
     }
 }

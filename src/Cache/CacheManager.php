@@ -8,9 +8,9 @@ use Blueprint\Engine\Config\BlueprintConfig;
 
 /**
  * Cache Manager
- * 
+ *
  * Handles caching of compiled templates with automatic invalidation.
- * 
+ *
  * @package Blueprint\Engine\Cache
  */
 class CacheManager
@@ -21,7 +21,7 @@ class CacheManager
 
     /**
      * Constructor
-     * 
+     *
      * @param BlueprintConfig $config Configuration
      */
     public function __construct(BlueprintConfig $config)
@@ -32,7 +32,7 @@ class CacheManager
 
     /**
      * Create from path and enabled flag
-     * 
+     *
      * @param string $cachePath Cache directory path
      * @param bool $enabled Is cache enabled
      * @return self
@@ -43,13 +43,13 @@ class CacheManager
             'cache' => $cachePath,
             'cache_enabled' => $enabled,
         ]);
-        
+
         return new self($config);
     }
 
     /**
      * Check if cache is enabled
-     * 
+     *
      * @return bool
      */
     public function isEnabled(): bool
@@ -59,7 +59,7 @@ class CacheManager
 
     /**
      * Enable or disable cache
-     * 
+     *
      * @param bool $enabled Enable flag
      * @return self
      */
@@ -71,7 +71,7 @@ class CacheManager
 
     /**
      * Get cache directory path
-     * 
+     *
      * @return string
      */
     public function getCachePath(): string
@@ -81,7 +81,7 @@ class CacheManager
 
     /**
      * Set cache directory path
-     * 
+     *
      * @param string $path Cache directory path
      * @return self
      */
@@ -93,7 +93,7 @@ class CacheManager
 
     /**
      * Get cache key for template
-     * 
+     *
      * @param string $templateName Template name
      * @param array $paths Template search paths (for uniqueness)
      * @return string
@@ -105,7 +105,7 @@ class CacheManager
 
     /**
      * Get compiled template file path
-     * 
+     *
      * @param string $templateName Template name
      * @param array $paths Template search paths
      * @return string
@@ -118,7 +118,7 @@ class CacheManager
 
     /**
      * Check if cached version exists and is fresh
-     * 
+     *
      * @param string $templateName Template name
      * @param string $sourcePath Source file path
      * @param array $paths Template search paths
@@ -145,7 +145,7 @@ class CacheManager
 
     /**
      * Check if cached version exists
-     * 
+     *
      * @param string $templateName Template name
      * @param array $paths Template search paths
      * @return bool
@@ -162,7 +162,7 @@ class CacheManager
 
     /**
      * Load compiled template from cache
-     * 
+     *
      * @param string $templateName Template name
      * @param array $paths Template search paths
      * @return string|null Compiled PHP code or null if not cached
@@ -185,7 +185,7 @@ class CacheManager
 
     /**
      * Store compiled template in cache
-     * 
+     *
      * @param string $templateName Template name
      * @param string $compiledCode Compiled PHP code
      * @param array $paths Template search paths
@@ -201,13 +201,13 @@ class CacheManager
         $dir = dirname($compiledPath);
 
         if (!is_dir($dir)) {
-            if (!mkdir($dir, 0755, true)) {
+            if (!mkdir($dir, 0o755, true)) {
                 return false;
             }
         }
 
         $result = file_put_contents($compiledPath, $compiledCode) !== false;
-        
+
         if ($result) {
             $this->compiledFiles[$templateName] = $compiledPath;
         }
@@ -217,7 +217,7 @@ class CacheManager
 
     /**
      * Include and execute cached template
-     * 
+     *
      * @param string $templateName Template name
      * @param array $paths Template search paths
      * @param array $context Template context
@@ -241,9 +241,9 @@ class CacheManager
         try {
             $__context = $context;
             $__template = $blueprint;
-            
+
             include $compiledPath;
-            
+
             return ob_get_clean();
         } catch (\Throwable $e) {
             ob_end_clean();
@@ -253,7 +253,7 @@ class CacheManager
 
     /**
      * Clear all cache
-     * 
+     *
      * @return bool Success
      */
     public function clear(): bool
@@ -277,7 +277,7 @@ class CacheManager
 
     /**
      * Clear cache for specific template
-     * 
+     *
      * @param string $templateName Template name
      * @param array $paths Template search paths
      * @return bool Success
@@ -297,7 +297,7 @@ class CacheManager
 
     /**
      * Get list of cached files
-     * 
+     *
      * @return array Array of file info
      */
     public function getCachedFiles(): array
@@ -324,7 +324,7 @@ class CacheManager
 
     /**
      * Get cache statistics
-     * 
+     *
      * @return array Statistics
      */
     public function getStats(): array

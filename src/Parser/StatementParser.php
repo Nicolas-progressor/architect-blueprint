@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Blueprint\Engine\Parser;
 
-use Blueprint\Engine\Exception\BlueprintException;
 use Blueprint\Engine\Lexer\TokenTypes;
 
 /**
  * Statement Parser
- * 
+ *
  * Parses control structures: if, for, foreach, block, extends, etc.
- * 
+ *
  * @package Blueprint\Engine\Parser
  */
 class StatementParser
@@ -87,7 +86,7 @@ class StatementParser
                 $this->context->advance();
                 $elseifCondition = $this->expressionParser->parse();
                 $this->context->expect(TokenTypes::TAG_END);
-                
+
                 $elseIfBody = $this->bodyParser->parse(['elseif', 'else', 'endif']);
                 $elseifs[] = [
                     'condition' => $elseifCondition,
@@ -180,7 +179,7 @@ class StatementParser
         if ($this->context->match(TokenTypes::NAME)) {
             $keyToken = $this->context->advance();
             $keyVar = $keyToken[1];
-            
+
             if ($this->context->match(TokenTypes::OPERATOR, '=>')) {
                 $this->context->advance();
                 if ($this->context->match(TokenTypes::NAME)) {
@@ -220,12 +219,12 @@ class StatementParser
     private function parseBlock(int $line): array
     {
         $name = null;
-        
+
         if ($this->context->match(TokenTypes::NAME)) {
             $nameToken = $this->context->advance();
             $name = $nameToken[1];
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         $body = $this->bodyParser->parse(['endblock']);
@@ -266,12 +265,12 @@ class StatementParser
     private function parseElement(int $line, string $type): array
     {
         $name = null;
-        
+
         if ($this->context->match(TokenTypes::NAME)) {
             $nameToken = $this->context->advance();
             $name = $nameToken[1];
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         return NodeFactory::element($type, $name, $line);
@@ -282,9 +281,9 @@ class StatementParser
     private function parseRaw(int $line): array
     {
         $this->context->expect(TokenTypes::TAG_END);
-        
+
         $content = '';
-        
+
         while (!$this->context->isEnd()) {
             if ($this->context->match(TokenTypes::TAG_START)) {
                 $peek = $this->context->peek(1);
@@ -297,7 +296,7 @@ class StatementParser
                 $content .= $token[1];
             }
         }
-        
+
         $this->consumeEndTag('endraw');
 
         return NodeFactory::raw($content, $line);
@@ -314,20 +313,20 @@ class StatementParser
     private function parseSet(int $line): array
     {
         $targets = [];
-        
+
         while ($this->context->match(TokenTypes::NAME)) {
             $targetToken = $this->context->advance();
             $targets[] = $targetToken[1];
-            
+
             if ($this->context->match(TokenTypes::PUNCTUATION, ',')) {
                 $this->context->advance();
             } else {
                 break;
             }
         }
-        
+
         $this->context->expect(TokenTypes::OPERATOR, '=');
-        
+
         $value = $this->expressionParser->parse();
         $this->context->expect(TokenTypes::TAG_END);
 
@@ -340,20 +339,20 @@ class StatementParser
     {
         $name = null;
         $params = [];
-        
+
         if ($this->context->match(TokenTypes::NAME)) {
             $nameToken = $this->context->advance();
             $name = $nameToken[1];
         }
-        
+
         if ($this->context->match(TokenTypes::PUNCTUATION, '(')) {
             $this->context->advance();
-            
+
             while (!$this->context->match(TokenTypes::PUNCTUATION, ')')) {
                 if ($this->context->match(TokenTypes::NAME)) {
                     $paramToken = $this->context->advance();
                     $params[] = ['name' => $paramToken[1]];
-                    
+
                     if ($this->context->match(TokenTypes::PUNCTUATION, ',')) {
                         $this->context->advance();
                     }
@@ -361,10 +360,10 @@ class StatementParser
                     break;
                 }
             }
-            
+
             $this->context->expect(TokenTypes::PUNCTUATION, ')');
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         $body = $this->bodyParser->parse(['endmacro']);
@@ -385,12 +384,12 @@ class StatementParser
     private function parseFilter(int $line): array
     {
         $name = null;
-        
+
         if ($this->context->match(TokenTypes::NAME)) {
             $nameToken = $this->context->advance();
             $name = $nameToken[1];
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         $body = $this->bodyParser->parse(['endfilter']);
@@ -430,12 +429,12 @@ class StatementParser
     private function parseSection(int $line): array
     {
         $name = null;
-        
+
         if ($this->context->match(TokenTypes::NAME)) {
             $nameToken = $this->context->advance();
             $name = $nameToken[1];
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         $body = $this->bodyParser->parse(['endsection']);
@@ -456,7 +455,7 @@ class StatementParser
     private function parseYield(int $line): array
     {
         $name = 'content';
-        
+
         if ($this->context->match(TokenTypes::NAME)) {
             $nameToken = $this->context->advance();
             $name = $nameToken[1];
@@ -464,7 +463,7 @@ class StatementParser
             $nameToken = $this->context->advance();
             $name = trim($nameToken[1], '"\'');
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         return NodeFactory::yieldNode($name, $line);
@@ -482,15 +481,15 @@ class StatementParser
     private function parseGenericTag(string $name, int $line): array
     {
         $args = [];
-        
+
         while (!$this->context->match(TokenTypes::TAG_END) && !$this->context->isEnd()) {
             $args[] = $this->expressionParser->parse();
-            
+
             if ($this->context->match(TokenTypes::PUNCTUATION, ',')) {
                 $this->context->advance();
             }
         }
-        
+
         $this->context->expect(TokenTypes::TAG_END);
 
         return [

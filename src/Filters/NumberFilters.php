@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Filters;
 
 /**
  * Number Filters
- * 
+ *
  * Filters for number manipulation.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class NumberFilters
 {
     /**
      * Get all number filters
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFilters(): array

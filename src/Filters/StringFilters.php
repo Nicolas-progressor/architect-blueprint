@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Filters;
 
 /**
  * String Filters
- * 
+ *
  * Filters for string manipulation.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class StringFilters
 {
     /**
      * Get all string filters
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFilters(): array
@@ -102,7 +102,7 @@ class StringFilters
 
     /**
      * Truncate string
-     * 
+     *
      * Truncates a string to a given length, including suffix.
      * Example: truncate('Hello World', 5) returns 'He...' (2 chars + 3 suffix = 5 total)
      */
@@ -112,14 +112,14 @@ class StringFilters
         $len = (int) $length;
         $suffixStr = (string) $suffix;
         $suffixLen = mb_strlen($suffixStr, 'UTF-8');
-        
+
         if (mb_strlen($str, 'UTF-8') <= $len) {
             return $str;
         }
 
         // Calculate available space for content (total length - suffix length)
         $contentLen = max(0, $len - $suffixLen);
-        
+
         return mb_substr($str, 0, $contentLen, 'UTF-8') . $suffixStr;
     }
 
@@ -139,7 +139,7 @@ class StringFilters
         if (is_array($value)) {
             return implode('', array_map(fn($item) => self::replace($item, $search, $replace), $value));
         }
-        
+
         return str_replace((string) $search, (string) $replace, (string) $value);
     }
 

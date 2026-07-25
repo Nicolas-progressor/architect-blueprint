@@ -6,7 +6,7 @@ namespace Blueprint\Engine\Contracts;
 
 /**
  * Function Registry Interface
- * 
+ *
  * @package Blueprint\Engine\Contracts
  */
 interface FunctionRegistryInterface

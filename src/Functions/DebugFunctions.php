@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * Debug Functions
- * 
+ *
  * Functions for debugging.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class DebugFunctions
 {
     /**
      * Get all debug functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array

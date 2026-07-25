@@ -8,31 +8,31 @@ use Blueprint\Engine\Contracts\FilterRegistryInterface;
 
 /**
  * Filter Registry
- * 
+ *
  * Manages filter registration and retrieval.
  * Supports lazy loading of filter groups.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class FilterRegistry implements FilterRegistryInterface
 {
     /**
      * Registered filters
-     * 
+     *
      * @var array<string, callable>
      */
     protected array $filters = [];
 
     /**
      * Filter groups (lazy loaded)
-     * 
+     *
      * @var array<string, class-string>
      */
     protected array $groups = [];
 
     /**
      * Loaded groups cache
-     * 
+     *
      * @var array<string, bool>
      */
     protected array $loadedGroups = [];
@@ -77,7 +77,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Register a filter
-     * 
+     *
      * @param string $name Filter name
      * @param callable $filter Filter callable
      */
@@ -88,7 +88,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Register multiple filters
-     * 
+     *
      * @param array<string, callable> $filters Filters to register
      */
     public function registerMany(array $filters): void
@@ -100,7 +100,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Get filter by name
-     * 
+     *
      * @param string $name Filter name
      * @return callable|null
      */
@@ -119,7 +119,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Check if filter exists
-     * 
+     *
      * @param string $name Filter name
      * @return bool
      */
@@ -137,7 +137,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Get all registered filters
-     * 
+     *
      * @return array<string, callable>
      */
     public function getAll(): array
@@ -152,7 +152,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Remove a filter
-     * 
+     *
      * @param string $name Filter name
      */
     public function remove(string $name): void
@@ -171,7 +171,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Load filter from groups
-     * 
+     *
      * @param string $name Filter name
      */
     protected function loadFilterFromGroups(string $name): void
@@ -184,7 +184,7 @@ class FilterRegistry implements FilterRegistryInterface
             // Check if this group might have the filter
             if (method_exists($class, $name) || $this->groupHasFilter($class, $name)) {
                 $this->loadGroup($groupName);
-                
+
                 if (isset($this->filters[$name])) {
                     return;
                 }
@@ -203,7 +203,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Load a filter group
-     * 
+     *
      * @param string $groupName Group name
      */
     protected function loadGroup(string $groupName): void
@@ -233,7 +233,7 @@ class FilterRegistry implements FilterRegistryInterface
 
     /**
      * Register a custom filter group
-     * 
+     *
      * @param string $name Group name
      * @param string $class Class name with getFilters() method
      */

@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Filters;
 
 /**
  * Type Filters
- * 
+ *
  * Filters for type checking and default values.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class TypeFilters
 {
     /**
      * Get all type filters
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFilters(): array

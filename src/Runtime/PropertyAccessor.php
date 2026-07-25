@@ -6,17 +6,17 @@ namespace Blueprint\Engine\Runtime;
 
 /**
  * Property Accessor
- * 
+ *
  * Handles accessing properties on objects and arrays.
  * Supports property access, getter methods, and magic methods.
- * 
+ *
  * @package Blueprint\Engine\Runtime
  */
 class PropertyAccessor
 {
     /**
      * Get property value from object or array
-     * 
+     *
      * @param mixed $object Object or array
      * @param string $property Property name
      * @return mixed
@@ -42,7 +42,7 @@ class PropertyAccessor
 
     /**
      * Get object property using various strategies
-     * 
+     *
      * @param object $object Object
      * @param string $property Property name
      * @return mixed
@@ -87,7 +87,7 @@ class PropertyAccessor
 
     /**
      * Check if property exists
-     * 
+     *
      * @param mixed $object Object or array
      * @param string $property Property name
      * @return bool
@@ -129,7 +129,7 @@ class PropertyAccessor
 
     /**
      * Get nested property using dot notation
-     * 
+     *
      * @param mixed $object Object or array
      * @param string $path Dot-separated path (e.g., "user.profile.name")
      * @param mixed $default Default value

@@ -6,10 +6,10 @@ namespace Blueprint\Engine\Lexer;
 
 /**
  * Template Tokenizer
- * 
+ *
  * Splits template source into TEXT and tag tokens.
  * Handles {{ }}, {% %}, {# #}, {!! !!} delimiters.
- * 
+ *
  * @package Blueprint\Engine\Lexer
  */
 class TemplateTokenizer
@@ -19,14 +19,14 @@ class TemplateTokenizer
      */
     public function tokenize(string $source, TokenStream $stream): void
     {
-        $source = str_replace(array("\r\n", "\r"), "\n", $source);
-        
+        $source = str_replace(["\r\n", "\r"], "\n", $source);
+
         $pos = 0;
         $length = strlen($source);
-        
+
         while ($pos < $length) {
             $next = $this->findNextTag($source, $pos);
-            
+
             if ($next === null) {
                 $text = substr($source, $pos);
                 if ($text !== '') {
@@ -34,19 +34,19 @@ class TemplateTokenizer
                 }
                 break;
             }
-            
+
             if ($next['pos'] > $pos) {
                 $text = substr($source, $pos, $next['pos'] - $pos);
                 if ($text !== '') {
                     $stream->addToken(TokenTypes::TEXT, $text);
                 }
             }
-            
+
             $this->processTag($source, $next, $stream);
-            
+
             $pos = $next['end'];
         }
-        
+
         $stream->add(Token::eof($stream->current()?->line ?? 1, $stream->current()?->column ?? 1));
     }
 
@@ -55,44 +55,44 @@ class TemplateTokenizer
      */
     private function findNextTag(string $source, int $from): ?array
     {
-        $tagTypes = array(
-            'comment'  => array('start' => '{#', 'end' => '#}'),
-            'raw'      => array('start' => '{!!', 'end' => '!!}'),
-            'variable' => array('start' => '{{', 'end' => '}}'),
-            'tag'      => array('start' => '{%', 'end' => '%}'),
-        );
-        
+        $tagTypes = [
+            'comment'  => ['start' => '{#', 'end' => '#}'],
+            'raw'      => ['start' => '{!!', 'end' => '!!}'],
+            'variable' => ['start' => '{{', 'end' => '}}'],
+            'tag'      => ['start' => '{%', 'end' => '%}'],
+        ];
+
         $minPos = PHP_INT_MAX;
         $found = null;
-        
+
         foreach ($tagTypes as $type => $delimiters) {
             $pos = strpos($source, $delimiters['start'], $from);
-            
+
             if ($pos !== false && $pos < $minPos) {
                 $minPos = $pos;
-                $found = array(
+                $found = [
                     'type' => $type,
                     'pos' => $pos,
                     'start' => $delimiters['start'],
                     'end' => $delimiters['end'],
-                );
+                ];
             }
         }
-        
+
         if ($found === null) {
             return null;
         }
-        
+
         $endPos = strpos($source, $found['end'], $found['pos'] + strlen($found['start']));
-        
+
         if ($endPos === false) {
             return null;
         }
-        
+
         $found['end'] = $endPos + strlen($found['end']);
         $found['innerStart'] = $found['pos'] + strlen($found['start']);
         $found['innerEnd'] = $endPos;
-        
+
         return $found;
     }
 
@@ -102,7 +102,7 @@ class TemplateTokenizer
     private function processTag(string $source, array $tag, TokenStream $stream): void
     {
         $inner = substr($source, $tag['innerStart'], $tag['innerEnd'] - $tag['innerStart']);
-        
+
         switch ($tag['type']) {
             case 'comment':
                 $this->processComment($inner, $stream);
@@ -161,12 +161,12 @@ class TemplateTokenizer
     private function processControlTag(string $inner, string $source, array $tag, TokenStream $stream): void
     {
         $innerTrimmed = trim($inner);
-        
+
         if ($innerTrimmed === 'raw') {
             $this->processRawBlock($source, $tag, $stream);
             return;
         }
-        
+
         $stream->addToken(TokenTypes::TAG_START, '{%');
         if (trim($inner) !== '') {
             $stream->addToken(TokenTypes::TEXT, $inner);
@@ -181,24 +181,24 @@ class TemplateTokenizer
     {
         $searchPos = $tag['end'];
         $endrawPos = null;
-        
+
         while ($searchPos < strlen($source)) {
             $nextTag = strpos($source, '{%', $searchPos);
-            
+
             if ($nextTag === false) {
                 break;
             }
-            
+
             $tagContent = substr($source, $nextTag + 2, 20);
-            
+
             if (preg_match('/^\s*endraw\s*%}/', $tagContent)) {
                 $endrawPos = $nextTag;
                 break;
             }
-            
+
             $searchPos = $nextTag + 2;
         }
-        
+
         if ($endrawPos !== null) {
             $rawContent = substr($source, $tag['end'], $endrawPos - $tag['end']);
             if ($rawContent !== '') {

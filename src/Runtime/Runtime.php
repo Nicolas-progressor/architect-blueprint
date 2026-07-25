@@ -10,10 +10,10 @@ use Blueprint\Engine\Contracts\RuntimeInterface;
 
 /**
  * Template Runtime Environment
- * 
+ *
  * Provides runtime functions for compiled templates.
  * Fully DI-based, no static methods.
- * 
+ *
  * @package Blueprint\Engine\Runtime
  */
 class Runtime implements RuntimeInterface
@@ -79,7 +79,7 @@ class Runtime implements RuntimeInterface
     public function applyFilter(string $name, mixed $value, array $args = []): mixed
     {
         $filter = $this->filterRegistry->get($name);
-        
+
         if ($filter !== null) {
             return $filter($value, ...$args);
         }
@@ -111,7 +111,7 @@ class Runtime implements RuntimeInterface
     public function callFunction(string $name, array $args = [], array $context = []): mixed
     {
         $function = $this->functionRegistry->get($name);
-        
+
         if ($function !== null) {
             return $function(...$args);
         }
@@ -144,11 +144,11 @@ class Runtime implements RuntimeInterface
     {
         $parentContext = $context;
         $parentContext['__blocks'] = $blocks;
-        
+
         if ($blueprint && method_exists($blueprint, 'render')) {
             return $blueprint->render($parentTemplate, $parentContext);
         }
-        
+
         return '';
     }
 
@@ -202,4 +202,3 @@ class Runtime implements RuntimeInterface
         return (string) $value;
     }
 }
-

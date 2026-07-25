@@ -6,9 +6,9 @@ namespace Blueprint\Engine\Parser;
 
 /**
  * Node Factory
- * 
+ *
  * Creates AST nodes with consistent structure.
- * 
+ *
  * @package Blueprint\Engine\Parser
  */
 final class NodeFactory

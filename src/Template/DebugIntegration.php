@@ -6,10 +6,10 @@ namespace Blueprint\Engine\Template;
 
 /**
  * Debug Integration
- * 
+ *
  * Handles integration with Debug service for logging
  * template compilation, errors, and cache information.
- * 
+ *
  * @package Blueprint\Engine\Template
  */
 class DebugIntegration
@@ -31,7 +31,7 @@ class DebugIntegration
         if ($this->container === null) {
             return;
         }
-        
+
         try {
             $this->debug = $this->container->get('debug');
         } catch (\Exception $e) {
@@ -95,10 +95,10 @@ class DebugIntegration
                 'cache_enabled' => $cacheEnabled,
                 'cache_path' => $cachePath,
             ]);
-            
+
             // Add cache information
             $cacheFiles = [];
-            
+
             if (is_dir($cachePath)) {
                 $files = glob($cachePath . '/*.php');
                 foreach ($files as $file) {
@@ -110,14 +110,14 @@ class DebugIntegration
                     ];
                 }
             }
-            
+
             $this->debug->setBlueprintData([
                 'cache' => [
                     'enabled' => $cacheEnabled,
                     'path' => $cachePath,
                     'files_count' => count($cacheFiles),
                     'files' => $cacheFiles,
-                ]
+                ],
             ]);
         } catch (\Exception $e) {
             // Ignore debug errors

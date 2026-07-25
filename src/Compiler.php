@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Blueprint\Engine;
 
 use Blueprint\Engine\Compiler\ExpressionCompiler;
-use Blueprint\Engine\Compiler\StatementCompiler;
 use Blueprint\Engine\Compiler\PhpGenerator;
+use Blueprint\Engine\Compiler\StatementCompiler;
 use Blueprint\Engine\Lexer\Lexer;
 
 /**
  * Template Compiler (Facade)
- * 
+ *
  * Compiles Blueprint templates into optimized PHP code.
  * Delegates to specialized compilers:
  * - ExpressionCompiler for expressions
  * - StatementCompiler for control structures
  * - PhpGenerator for code generation
- * 
+ *
  * @package Blueprint\Engine
  */
 class Compiler
@@ -40,10 +40,10 @@ class Compiler
     {
         $lexer = new Lexer();
         $tokens = $lexer->tokenize($source);
-        
+
         $parser = new Parser();
         $ast = $parser->parse($tokens);
-        
+
         return $this->generatePhp($ast, $templateName);
     }
 
@@ -63,9 +63,9 @@ class Compiler
         $this->statementCompiler->reset();
 
         $php = $this->phpGenerator->generateHeader($templateName);
-        
+
         $bodyPhp = $this->compileNode($ast);
-        
+
         $layout = $this->statementCompiler->getLayout();
         $extends = $this->statementCompiler->getExtends();
         $blocks = $this->statementCompiler->getBlocks();
@@ -149,4 +149,3 @@ class Compiler
         return $this->phpGenerator;
     }
 }
-

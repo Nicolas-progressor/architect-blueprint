@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * Array Functions
- * 
+ *
  * Functions for array manipulation.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class ArrayFunctions
 {
     /**
      * Get all array functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array

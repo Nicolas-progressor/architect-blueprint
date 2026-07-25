@@ -8,10 +8,10 @@ use Blueprint\Engine\BlueprintExtension;
 
 /**
  * Extension Loader
- * 
+ *
  * Loads and registers Blueprint extensions from Composer packages.
  * Extensions are discovered via package's extra.blueprint.extension config.
- * 
+ *
  * @package Blueprint\Engine\Template
  */
 class ExtensionLoader
@@ -37,7 +37,7 @@ class ExtensionLoader
             }
 
             $extensionClass = $this->findExtensionClass($packageName);
-            
+
             if ($extensionClass === null) {
                 continue;
             }
@@ -53,7 +53,7 @@ class ExtensionLoader
     {
         try {
             $installPath = \Composer\InstalledVersions::getInstallPath($packageName);
-            
+
             if ($installPath === null || !is_dir($installPath)) {
                 return null;
             }
@@ -65,7 +65,7 @@ class ExtensionLoader
 
             $composerData = json_decode(file_get_contents($composerFile), true);
             $extra = $composerData['extra'] ?? [];
-            
+
             if (!isset($extra['blueprint']['extension'])) {
                 return null;
             }

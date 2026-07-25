@@ -6,7 +6,7 @@ namespace Blueprint\Engine\Contracts;
 
 /**
  * Blueprint Template Engine Interface
- * 
+ *
  * @package Blueprint\Engine\Contracts
  */
 interface BlueprintInterface

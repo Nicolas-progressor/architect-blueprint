@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Filters;
 
 /**
  * Date Filters
- * 
+ *
  * Filters for date/time manipulation.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class DateFilters
 {
     /**
      * Get all date filters
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFilters(): array

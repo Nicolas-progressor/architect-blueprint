@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace Blueprint\Engine;
 
-use Blueprint\Engine\Exception\BlueprintException;
 use Blueprint\Engine\Config\BlueprintConfig;
-use Blueprint\Engine\Template\TemplateRenderer;
-use Blueprint\Engine\Template\ElementRenderer;
-use Blueprint\Engine\Template\DebugIntegration;
-use Blueprint\Engine\Template\ExtensionLoader;
-use Blueprint\Engine\Runtime\Runtime;
 use Blueprint\Engine\Contracts\RuntimeInterface;
+use Blueprint\Engine\Runtime\Runtime;
+use Blueprint\Engine\Template\DebugIntegration;
+use Blueprint\Engine\Template\ElementRenderer;
+use Blueprint\Engine\Template\ExtensionLoader;
+use Blueprint\Engine\Template\TemplateRenderer;
 
 /**
  * Blueprint Template Engine
- * 
+ *
  * A Blade/Twig-like templating engine with automatic PHP code compilation,
  * template inheritance, filters, functions, and element/widget support.
- * 
+ *
  * Fully DI-based, no static methods or singletons.
- * 
+ *
  * @package Blueprint\Engine
  */
 class Blueprint
@@ -30,11 +29,11 @@ class Blueprint
     protected Compiler $compiler;
     protected RuntimeInterface $runtime;
     protected ?ElementManager $elementManager = null;
-    
+
     protected TemplateRenderer $templateRenderer;
     protected ElementRenderer $elementRenderer;
     protected DebugIntegration $debugIntegration;
-    
+
     protected array $context = [];
     protected ?object $container = null;
     protected ?string $currentTemplate = null;
@@ -44,22 +43,22 @@ class Blueprint
      * Constructor
      */
     public function __construct(
-        array|BlueprintConfig $config, 
+        array|BlueprintConfig $config,
         ?object $container = null,
         ?RuntimeInterface $runtime = null
     ) {
-        $this->config = is_array($config) 
-            ? new BlueprintConfig($config) 
+        $this->config = is_array($config)
+            ? new BlueprintConfig($config)
             : $config;
         $this->container = $container;
-        
+
         $this->loader = new Loader($this->config);
         $this->compiler = new Compiler();
         $this->runtime = $runtime ?? RuntimeFactory::create();
-        
+
         // Initialize components
         $this->initializeComponents();
-        
+
         // Load extensions
         $extensionLoader = new ExtensionLoader();
         $extensionLoader->loadExtensions($this);
@@ -76,14 +75,14 @@ class Blueprint
             $this->config->isDebug(),
             $this->config->showErrors()
         );
-        
+
         $this->elementRenderer = new ElementRenderer(
             $this->loader,
             $this->container,
             $this->context,
             $this->config->isDebug()
         );
-        
+
         $this->debugIntegration = new DebugIntegration($this->container);
     }
 
@@ -198,11 +197,11 @@ class Blueprint
         $fullContext = array_merge($this->context, $context);
         $fullContext['__runtime'] = $this->runtime;
         $fullContext['__blueprint'] = $this;
-        
+
         $this->loadElementsConfig($template);
-        
+
         $cacheFresh = $this->loader->isCacheEnabled() && $this->loader->isFresh($template);
-        
+
         $this->debugIntegration->logCompile(
             $template,
             $this->loader->getCompiledPath($template),
@@ -285,15 +284,15 @@ class Blueprint
     {
         if ($this->elementManager === null) {
             $this->elementManager = new ElementManager($this);
-            
+
             foreach ($this->config->getElementsDirs() as $dir) {
                 $this->elementManager->addDirectory($dir);
             }
-            
+
             foreach ($this->loader->getPaths() as $path) {
                 $this->elementManager->addDirectory($path . '/elements');
             }
-            
+
             $this->elementRenderer->setElementManager($this->elementManager);
         }
 
@@ -344,7 +343,7 @@ class Blueprint
         $this->elementRenderer->setContext($this->context);
         $this->elementRenderer->setCurrentTemplate($this->currentTemplate);
         $this->elementRenderer->setElementsConfig($this->elementsConfig);
-        
+
         return $this->elementRenderer->render($name, $data, $this);
     }
 
@@ -515,29 +514,29 @@ class Blueprint
         if (count($this->elementsConfig) > 0) {
             return;
         }
-        
+
         if (!$template || !$this->container) {
             return;
         }
-        
+
         $templatePath = $this->loader->findTemplate($template);
-        
+
         if (!$templatePath) {
             return;
         }
-        
+
         $templateDir = dirname($templatePath);
-        
+
         // Load global elements.json
         $elementsFile = $templateDir . '/elements.json';
-        
+
         if (file_exists($elementsFile)) {
             $data = json_decode(file_get_contents($elementsFile), true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $this->elementsConfig = $data;
             }
         }
-        
+
         // Load routed elements (elements/*.json)
         $elementsDir = $templateDir . '/elements';
         if (is_dir($elementsDir)) {
@@ -549,7 +548,7 @@ class Blueprint
                 }
             }
         }
-        
+
         $this->loadRoutedElements($templateDir);
     }
 
@@ -570,19 +569,19 @@ class Blueprint
         } catch (\Exception $e) {
             return;
         }
-        
+
         $elementsDir = $templateDir . '/elements';
         if (!is_dir($elementsDir)) {
             return;
         }
-        
+
         $files = glob($elementsDir . '/*.json');
         foreach ($files as $file) {
             $routedData = json_decode(file_get_contents($file), true);
             if (json_last_error() !== JSON_ERROR_NONE || !is_array($routedData)) {
                 continue;
             }
-            
+
             if (isset($routedData[$module][$controller][$action])) {
                 $elements = $routedData[$module][$controller][$action];
                 if (is_array($elements)) {
@@ -592,4 +591,3 @@ class Blueprint
         }
     }
 }
-

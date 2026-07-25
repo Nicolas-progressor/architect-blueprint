@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Filters;
 
 /**
  * Conversion Filters
- * 
+ *
  * Filters for type conversion and data transformation.
- * 
+ *
  * @package Blueprint\Engine\Filters
  */
 class ConversionFilters
 {
     /**
      * Get all conversion filters
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFilters(): array

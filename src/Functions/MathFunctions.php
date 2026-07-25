@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * Math Functions
- * 
+ *
  * Functions for mathematical operations.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class MathFunctions
 {
     /**
      * Get all math functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array

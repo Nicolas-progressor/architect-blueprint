@@ -6,16 +6,16 @@ namespace Blueprint\Engine\Functions;
 
 /**
  * Date Functions
- * 
+ *
  * Functions for date/time operations.
- * 
+ *
  * @package Blueprint\Engine\Functions
  */
 class DateFunctions
 {
     /**
      * Get all date functions
-     * 
+     *
      * @return array<string, callable>
      */
     public static function getFunctions(): array

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Blueprint\Engine\Template;
 
+use Blueprint\Engine\Compiler;
 use Blueprint\Engine\Exception\BlueprintException;
 use Blueprint\Engine\Loader;
-use Blueprint\Engine\Compiler;
 
 /**
  * Template Renderer
- * 
+ *
  * Handles template rendering, compilation, and caching.
- * 
+ *
  * @package Blueprint\Engine\Template
  */
 class TemplateRenderer
@@ -87,13 +87,13 @@ class TemplateRenderer
         try {
             $__context = $context;
             $__template = $blueprint;
-            
+
             eval('?>' . $phpCode);
-            
+
             return ob_get_clean();
         } catch (\Throwable $e) {
             ob_end_clean();
-            
+
             if ($this->debug) {
                 throw BlueprintException::runtimeError(
                     $e->getMessage(),
@@ -102,8 +102,8 @@ class TemplateRenderer
                     $this->getCodeSnippet($phpCode, $e->getLine())
                 );
             }
-            
-            return $this->showErrors 
+
+            return $this->showErrors
                 ? $this->renderError($e, $templateName)
                 : '';
         }
@@ -115,19 +115,19 @@ class TemplateRenderer
     protected function evaluateCompiled(string $template, array $context, ?object $blueprint = null): string
     {
         $compiledPath = $this->loader->getCompiledPath($template);
-        
+
         ob_start();
 
         try {
             $__context = $context;
             $__template = $blueprint;
-            
+
             include $compiledPath;
-            
+
             return ob_get_clean();
         } catch (\Throwable $e) {
             ob_end_clean();
-            
+
             $this->loader->clearCacheFor($template);
             return $this->render($template, $context, $blueprint);
         }
@@ -140,11 +140,11 @@ class TemplateRenderer
     {
         $compiledPath = $this->loader->getCompiledPath($template);
         $dir = dirname($compiledPath);
-        
+
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            mkdir($dir, 0o755, true);
         }
-        
+
         file_put_contents($compiledPath, $phpCode);
     }
 
@@ -156,13 +156,13 @@ class TemplateRenderer
         $lines = explode("\n", $code);
         $start = max(0, $line - $context - 1);
         $end = min(count($lines), $line + $context);
-        
+
         $snippet = '';
         for ($i = $start; $i < $end; $i++) {
             $prefix = ($i + 1 === $line) ? '>>> ' : '    ';
             $snippet .= $prefix . ($i + 1) . ': ' . ($lines[$i] ?? '') . "\n";
         }
-        
+
         return $snippet;
     }
 
